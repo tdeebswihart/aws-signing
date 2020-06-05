@@ -1,3 +1,7 @@
+## 0.3.2 (Jun 05, 2020)
+
+* Fix internal references
+
 ## 0.3.0 (Jun 05, 2020)
 
 * Upgrade to AWS SDK for GO version 0.23.0

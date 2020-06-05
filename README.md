@@ -16,7 +16,7 @@ import (
 	
 	"github.com/aws/aws-sdk-go-v2/aws/credentials"
 	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
-	"github.com/BSick7/aws-signing/signing"
+	"github.com/chronoslynx/aws-signing/signing"
 )
 
 var credsProvider aws.CredentialsProvider
@@ -39,7 +39,7 @@ This allows you to work seamlessly between aws cli tool without setting up addit
 It can be used as a golang binary or docker image.
 
 ```
-go get -u github.com/BSick7/aws-signing/aws-curl
+go get -u github.com/chronoslynx/aws-signing/aws-curl
 
 aws-curl -h
 Usage: aws-curl [options...] <path>
@@ -73,7 +73,7 @@ Now, you can curl elasticsearch as if it were sitting on your local machine.
 This utility can be used as a golang binary or docker image.
 
 ```
-go get -u github.com/BSick7/aws-signing/aws-reverse-proxy
+go get -u github.com/chronoslynx/aws-signing/aws-reverse-proxy
 
 aws-reverse-proxy -h
 Usage: aws-reverse-proxy [options...]

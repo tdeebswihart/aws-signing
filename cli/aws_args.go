@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/BSick7/aws-signing/config"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/chronoslynx/aws-signing/config"
 )
 
 type AwsArgs struct {

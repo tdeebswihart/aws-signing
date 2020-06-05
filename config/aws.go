@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/BSick7/aws-signing/signing"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	"github.com/chronoslynx/aws-signing/signing"
 )
 
 var (
