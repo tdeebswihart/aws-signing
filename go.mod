@@ -1,4 +1,4 @@
-module github.com/BSick7/aws-signing
+module github.com/chronoslynx/aws-signing
 
 require (
 	github.com/aws/aws-sdk-go-v2 v0.23.0
