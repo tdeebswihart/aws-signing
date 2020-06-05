@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -67,6 +68,6 @@ func (a AwsArgs) Dump() {
 	}
 	if _, ok := os.LookupEnv("AWS_SIGNING"); a.use || ok {
 		cfg, _ := external.LoadDefaultAWSConfig()
-		log.Println(cfg.Credentials.Retrieve())
+		log.Println(cfg.Credentials.Retrieve(context.Background()))
 	}
 }

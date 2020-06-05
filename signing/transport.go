@@ -2,6 +2,7 @@ package signing
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -19,7 +20,7 @@ var (
 
 // Signer represents an interface that v1 and v2 aws sdk follows to sign http requests
 type Signer interface {
-	Sign(r *http.Request, body io.ReadSeeker, service, region string, signTime time.Time) (http.Header, error)
+	Sign(ctx context.Context, r *http.Request, body io.ReadSeeker, service, region string, signTime time.Time) (http.Header, error)
 }
 
 // Creates a new transport that can be used by http.Client
@@ -82,7 +83,7 @@ func (t *Transport) sign(req *http.Request) error {
 
 	if body, err := t.rebuildBody(req); err != nil {
 		return err
-	} else if _, err := t.signer.Sign(req, body, t.service, t.region, date); err != nil {
+	} else if _, err := t.signer.Sign(req.Context(), req, body, t.service, t.region, date); err != nil {
 		return fmt.Errorf("error signing request: %s", err)
 	}
 	return nil
