@@ -22,7 +22,7 @@ release:
 	    -output "dist/aws-reverse-proxy_{{.OS}}_{{.Arch}}" ./aws-reverse-proxy/
 	gox -arch="amd64" -os="linux windows darwin" \
 	    -output "dist/aws-curl_{{.OS}}_{{.Arch}}" ./aws-curl/
-	ghr -t $$GITHUB_TOKEN -u chronoslynx -r aws-signing -c $(COMMIT_SHA) --replace `cat VERSION` dist/
+	ghr -t $$GITHUB_TOKEN -u BishopFox -r aws-signing -c $(COMMIT_SHA) --replace `cat VERSION` dist/
 
 docker:
 	docker build -t bsick7/aws-signing .

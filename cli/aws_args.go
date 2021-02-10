@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/chronoslynx/aws-signing/config"
+	"github.com/BishopFox/aws-signing/config"
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
 )
 
 type AwsArgs struct {
@@ -67,7 +67,11 @@ func (a AwsArgs) Dump() {
 		return
 	}
 	if _, ok := os.LookupEnv("AWS_SIGNING"); a.use || ok {
-		cfg, _ := external.LoadDefaultAWSConfig()
-		log.Println(cfg.Credentials.Retrieve(context.Background()))
+		ctx := context.Background()
+		cfg, err := awscfg.LoadDefaultConfig(ctx)
+		if err != nil {
+			return
+		}
+		log.Println(cfg.Credentials.Retrieve(ctx))
 	}
 }

@@ -3,13 +3,16 @@ package signing
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	signer "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 )
 
 var (
@@ -20,16 +23,17 @@ var (
 
 // Signer represents an interface that v1 and v2 aws sdk follows to sign http requests
 type Signer interface {
-	Sign(ctx context.Context, r *http.Request, body io.ReadSeeker, service, region string, signTime time.Time) (http.Header, error)
+	SignHTTP(ctx context.Context, credentials aws.Credentials, r *http.Request, payloadHash string, service string, region string, signingTime time.Time, optFns ...func(options *signer.SignerOptions)) error
 }
 
 // Creates a new transport that can be used by http.Client
 // If region is unspecified, AWS_REGION environment variable is used
-func NewTransport(signer Signer, service, region string) *Transport {
+func NewTransport(signer Signer, credentials aws.Credentials, service, region string) *Transport {
 	return &Transport{
-		signer:  signer,
-		service: service,
-		region:  region,
+		signer:      signer,
+		credentials: credentials,
+		service:     service,
+		region:      region,
 	}
 }
 
@@ -37,6 +41,7 @@ func NewTransport(signer Signer, service, region string) *Transport {
 type Transport struct {
 	BaseTransport http.RoundTripper
 	signer        Signer
+	credentials   aws.Credentials
 	service       string
 	region        string
 }
@@ -81,17 +86,21 @@ func (t *Transport) sign(req *http.Request) error {
 	date := time.Now()
 	req.Header.Set("Date", date.Format(time.RFC3339))
 
-	if body, err := t.rebuildBody(req); err != nil {
+	hash, err := t.rebuildBody(req)
+	if err != nil {
 		return err
-	} else if _, err := t.signer.Sign(req.Context(), req, body, t.service, t.region, date); err != nil {
+	}
+	// PayloadHash is the hex encoded SHA-256 hash of the request payload
+	if err := t.signer.SignHTTP(req.Context(), t.credentials, req, string(hash), t.service, t.region, date); err != nil {
 		return fmt.Errorf("error signing request: %s", err)
 	}
 	return nil
 }
 
-func (t *Transport) rebuildBody(req *http.Request) (io.ReadSeeker, error) {
+func (t *Transport) rebuildBody(req *http.Request) ([]byte, error) {
 	if req.Body == nil {
-		return nil, nil
+		sum := sha256.Sum256(nil)
+		return sum[:], nil
 	}
 
 	d, err := ioutil.ReadAll(req.Body)
@@ -99,5 +108,6 @@ func (t *Transport) rebuildBody(req *http.Request) (io.ReadSeeker, error) {
 		return nil, fmt.Errorf("error reading http body to sign: %s", err)
 	}
 	req.Body = ioutil.NopCloser(bytes.NewReader(d))
-	return bytes.NewReader(d), nil
+	sum := sha256.Sum256(d)
+	return sum[:], nil
 }

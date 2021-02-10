@@ -1,14 +1,15 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/BishopFox/aws-signing/signing"
 	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
-	"github.com/chronoslynx/aws-signing/signing"
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
 )
 
 var (
@@ -49,13 +50,17 @@ func MergeAws(cfgs ...Aws) Aws {
 }
 
 func (a Aws) Transport() (http.RoundTripper, error) {
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := awscfg.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("error loading aws config: %s", err)
 	}
 	if region := os.Getenv("AWS_REGION"); region != "" {
 		cfg.Region = region
 	}
-	signer := v4.NewSigner(cfg.Credentials)
-	return signing.NewTransport(signer, a.Service, cfg.Region), nil
+	signer := v4.NewSigner()
+	creds, err := cfg.Credentials.Retrieve(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %w", err)
+	}
+	return signing.NewTransport(signer, creds, a.Service, cfg.Region), nil
 }

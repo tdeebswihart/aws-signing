@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/chronoslynx/aws-signing/cli"
-	"github.com/chronoslynx/aws-signing/config"
+	"github.com/BishopFox/aws-signing/cli"
+	"github.com/BishopFox/aws-signing/config"
 )
 
 var (

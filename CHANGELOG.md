@@ -1,3 +1,7 @@
+## 1.0.0 (Feb 10, 2021)
+
+* Update to aws-sdk-go-v2@v1.2.0
+
 ## 0.3.2 (Jun 05, 2020)
 
 * Fix internal references

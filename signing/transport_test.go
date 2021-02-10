@@ -17,7 +17,12 @@ func (m mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func TestTransport_All(t *testing.T) {
-	signer := v4.NewSigner(aws.NewStaticCredentialsProvider("a", "b", "c"))
+	creds := aws.Credentials{
+		AccessKeyID:     "a",
+		SecretAccessKey: "b",
+		SessionToken:    "c",
+	}
+	signer := v4.NewSigner()
 	tests := []struct {
 		signer  Signer
 		service string
@@ -31,7 +36,7 @@ func TestTransport_All(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		transport := NewTransport(test.signer, test.service, test.region)
+		transport := NewTransport(test.signer, creds, test.service, test.region)
 		gotAuthorization := ""
 		transport.BaseTransport = mockTransport{
 			RoundTripFunc: func(req *http.Request) (*http.Response, error) {
