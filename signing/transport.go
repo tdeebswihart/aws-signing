@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -86,28 +87,29 @@ func (t *Transport) sign(req *http.Request) error {
 	date := time.Now()
 	req.Header.Set("Date", date.Format(time.RFC3339))
 
-	hash, err := t.rebuildBody(req)
+	hash, err := t.hashPayload(req)
 	if err != nil {
 		return err
 	}
 	// PayloadHash is the hex encoded SHA-256 hash of the request payload
-	if err := t.signer.SignHTTP(req.Context(), t.credentials, req, string(hash), t.service, t.region, date); err != nil {
+	if err := t.signer.SignHTTP(req.Context(), t.credentials, req, hash, t.service, t.region, date); err != nil {
 		return fmt.Errorf("error signing request: %s", err)
 	}
 	return nil
 }
 
-func (t *Transport) rebuildBody(req *http.Request) ([]byte, error) {
+func (t *Transport) hashPayload(req *http.Request) (string, error) {
+	var sum [32]byte
 	if req.Body == nil {
-		sum := sha256.Sum256(nil)
-		return sum[:], nil
+		sum = sha256.Sum256(nil)
+	} else {
+		d, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			return "", fmt.Errorf("error reading http body to sign: %s", err)
+		}
+		req.Body = ioutil.NopCloser(bytes.NewReader(d))
+		sum = sha256.Sum256(d)
 	}
 
-	d, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading http body to sign: %s", err)
-	}
-	req.Body = ioutil.NopCloser(bytes.NewReader(d))
-	sum := sha256.Sum256(d)
-	return sum[:], nil
+	return hex.EncodeToString(sum[:]), nil
 }

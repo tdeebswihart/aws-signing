@@ -1,3 +1,7 @@
+## 1.0.1 (Mar 07, 2021)
+
+* Fix a bug calculating payload hashes
+
 ## 1.0.0 (Feb 10, 2021)
 
 * Update to aws-sdk-go-v2@v1.2.0

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -30,13 +31,14 @@ Options:
 )
 
 func main() {
+	ctx := context.Background()
 	cfg, err := parse(os.Args)
 	if err != nil {
 		fmt.Println("error parsing")
 		os.Exit(1)
 	}
 
-	transport, err := cfg.Aws.Transport()
+	transport, err := cfg.Aws.Transport(ctx)
 	if err != nil {
 		fmt.Printf("error creating transport: %s\n", err)
 		os.Exit(1)
