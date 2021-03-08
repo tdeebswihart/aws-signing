@@ -49,8 +49,8 @@ func MergeAws(cfgs ...Aws) Aws {
 	return rv
 }
 
-func (a Aws) Transport() (http.RoundTripper, error) {
-	cfg, err := awscfg.LoadDefaultConfig(context.Background())
+func (a Aws) Transport(ctx context.Context) (http.RoundTripper, error) {
+	cfg, err := awscfg.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error loading aws config: %s", err)
 	}
@@ -58,7 +58,7 @@ func (a Aws) Transport() (http.RoundTripper, error) {
 		cfg.Region = region
 	}
 	signer := v4.NewSigner()
-	creds, err := cfg.Credentials.Retrieve(context.Background())
+	creds, err := cfg.Credentials.Retrieve(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve credentials: %w", err)
 	}
