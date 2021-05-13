@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 
 COMMIT_SHA := $(shell git rev-parse HEAD)
 

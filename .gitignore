@@ -5,3 +5,4 @@
 # Golang
 dist/
 vendor/
+tf/.terraform.*
