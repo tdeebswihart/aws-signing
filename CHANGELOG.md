@@ -1,3 +1,7 @@
+## 1.0.2 (Nov 02, 2021)
+
+* Upgrade to build against golang 1.17 with AWS V2 go SDK
+
 ## 1.0.1 (Mar 07, 2021)
 
 * Fix a bug calculating payload hashes

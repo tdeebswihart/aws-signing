@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
@@ -31,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	transport, err := cfg.Aws.Transport()
+	transport, err := cfg.Aws.Transport(context.TODO())
 	if err != nil {
 		fmt.Printf("error creating transport: %s\n", err)
 		os.Exit(1)
